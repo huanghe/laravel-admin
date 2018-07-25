@@ -40,7 +40,7 @@ class TestCase extends BaseTestCase
         $this->app['config']->set('database.connections.mysql.host', env('MYSQL_HOST', 'localhost'));
         $this->app['config']->set('database.connections.mysql.database', 'laravel_admin');
         $this->app['config']->set('database.connections.mysql.username', 'root');
-        $this->app['config']->set('database.connections.mysql.password', '');
+        $this->app['config']->set('database.connections.mysql.password', '123456');
         $this->app['config']->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
         $this->app['config']->set('filesystems', require __DIR__.'/config/filesystems.php');
         $this->app['config']->set('admin', $adminConfig);

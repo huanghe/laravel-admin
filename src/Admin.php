@@ -244,6 +244,7 @@ class Admin
 
                 /* @var \Illuminate\Routing\Router $router */
                 $router->resource('auth/users', 'UserController');
+                $router->resource('auth/api/users', 'UserApiController');
                 $router->resource('auth/roles', 'RoleController');
                 $router->resource('auth/permissions', 'PermissionController');
                 $router->resource('auth/menu', 'MenuController', ['except' => ['create']]);
