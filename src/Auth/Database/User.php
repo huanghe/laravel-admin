@@ -3,18 +3,19 @@
 namespace Encore\Admin\Auth\Database;
 
 use Encore\Admin\Traits\AdminBuilder;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
- * Class Administrator.
+ * Class User.
  *
  * @property Role[] $roles
  */
-class Administrator extends Model implements AuthenticatableContract
+class User extends Authenticatable implements JWTSubject
 {
-    use Authenticatable, AdminBuilder, HasPermissions;
+    use AdminBuilder, HasPermissions;
+
+    protected $fillable = ['username', 'password', 'email', 'avatar'];
 
     /**
      * Create a new Eloquent model instance.
@@ -30,5 +31,15 @@ class Administrator extends Model implements AuthenticatableContract
         $this->setTable(config('admin.database.users_table'));
 
         parent::__construct($attributes);
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

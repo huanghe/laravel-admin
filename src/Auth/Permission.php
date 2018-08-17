@@ -29,7 +29,7 @@ class Permission
             return;
         }
 
-        if (Auth::guard('admin')->user()->cannot($permission)) {
+        if (Auth::guard('admin')->user()->cannotDo($permission)) {
             static::error();
         }
     }
@@ -87,7 +87,7 @@ class Permission
     {
         $response = response(Admin::content()->withError(trans('admin.deny')));
 
-        Pjax::respond($response);
+        return Pjax::respond($response);
     }
 
     /**

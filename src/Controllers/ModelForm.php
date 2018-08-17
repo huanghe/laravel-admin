@@ -5,6 +5,27 @@ namespace Encore\Admin\Controllers;
 trait ModelForm
 {
     /**
+     * Index interface.
+     *
+     * @return
+     */
+    public function index()
+    {
+        return $this->grid()->render();
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param $id
+     *
+     * @return
+     */
+    public function edit($id)
+    {
+        return $this->form()->edit($id);
+    }
+    /**
      * Display the specified resource.
      *
      * @param int $id

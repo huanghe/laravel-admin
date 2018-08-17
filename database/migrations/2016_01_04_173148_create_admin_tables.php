@@ -13,7 +13,7 @@ class CreateAdminTables extends Migration
     public function up()
     {
         $connection = config('admin.database.connection') ?: config('database.default');
-
+        Schema::dropIfExists('users');
         Schema::connection($connection)->create(config('admin.database.users_table'), function (Blueprint $table) {
             $table->increments('id');
             $table->string('username', 190)->unique();

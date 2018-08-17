@@ -50,7 +50,7 @@ return [
     'auth' => [
         'guards' => [
             'admin' => [
-                'driver'   => 'session',
+                'driver'   => 'jwt',
                 'provider' => 'admin',
             ],
         ],
@@ -58,7 +58,7 @@ return [
         'providers' => [
             'admin' => [
                 'driver' => 'eloquent',
-                'model'  => Encore\Admin\Auth\Database\Administrator::class,
+                'model' => Encore\Admin\Auth\Database\Administrator::class,
             ],
         ],
     ],
@@ -68,11 +68,11 @@ return [
      */
     'upload' => [
 
-        'disk' => 'admin',
+        'disk' => 'local',
 
         'directory' => [
             'image' => 'images',
-            'file'  => 'files',
+            'file' => 'files',
         ],
     ],
 
@@ -85,27 +85,27 @@ return [
         'connection' => '',
 
         // User tables and model.
-        'users_table' => 'admin_users',
+        'users_table' => 'system_users',
         'users_model' => Encore\Admin\Auth\Database\Administrator::class,
 
         // Role table and model.
-        'roles_table' => 'admin_roles',
+        'roles_table' => 'system_roles',
         'roles_model' => Encore\Admin\Auth\Database\Role::class,
 
         // Permission table and model.
-        'permissions_table' => 'admin_permissions',
+        'permissions_table' => 'system_permissions',
         'permissions_model' => Encore\Admin\Auth\Database\Permission::class,
 
         // Menu table and model.
-        'menu_table' => 'admin_menu',
+        'menu_table' => 'system_menu',
         'menu_model' => Encore\Admin\Auth\Database\Menu::class,
 
         // Pivot table for table above.
-        'operation_log_table'    => 'admin_operation_log',
-        'user_permissions_table' => 'admin_user_permissions',
-        'role_users_table'       => 'admin_role_users',
-        'role_permissions_table' => 'admin_role_permissions',
-        'role_menu_table'        => 'admin_role_menu',
+        'operation_log_table'    => 'system_operation_log',
+        'user_permissions_table' => 'system_user_permissions',
+        'role_users_table'       => 'system_role_users',
+        'role_permissions_table' => 'system_role_permissions',
+        'role_menu_table'        => 'system_role_menu',
     ],
 
     /*

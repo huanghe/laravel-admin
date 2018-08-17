@@ -69,7 +69,7 @@ trait HasPermissions
      *
      * @return bool
      */
-    public function can(string $permission) : bool
+    public function canDo(string $permission) : bool
     {
         if ($this->isAdministrator()) {
             return true;
@@ -89,9 +89,9 @@ trait HasPermissions
      *
      * @return bool
      */
-    public function cannot(string $permission) : bool
+    public function cannotDo(string $permission) : bool
     {
-        return !$this->can($permission);
+        return !$this->canDo($permission);
     }
 
     /**

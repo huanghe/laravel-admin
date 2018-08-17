@@ -196,7 +196,6 @@ class Model
     {
         if (empty($this->data)) {
             $collection = $this->get();
-
             if ($this->collectionCallback) {
                 $collection = call_user_func($this->collectionCallback, $collection);
             }

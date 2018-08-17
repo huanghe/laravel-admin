@@ -15,50 +15,6 @@ class RoleController extends Controller
     use ModelForm;
 
     /**
-     * Index interface.
-     *
-     * @return Content
-     */
-    public function index()
-    {
-        return Admin::content(function (Content $content) {
-            $content->header(trans('admin.roles'));
-            $content->description(trans('admin.list'));
-            $content->body($this->grid()->render());
-        });
-    }
-
-    /**
-     * Edit interface.
-     *
-     * @param $id
-     *
-     * @return Content
-     */
-    public function edit($id)
-    {
-        return Admin::content(function (Content $content) use ($id) {
-            $content->header(trans('admin.roles'));
-            $content->description(trans('admin.edit'));
-            $content->body($this->form()->edit($id));
-        });
-    }
-
-    /**
-     * Create interface.
-     *
-     * @return Content
-     */
-    public function create()
-    {
-        return Admin::content(function (Content $content) {
-            $content->header(trans('admin.roles'));
-            $content->description(trans('admin.create'));
-            $content->body($this->form());
-        });
-    }
-
-    /**
      * Make a grid builder.
      *
      * @return Grid

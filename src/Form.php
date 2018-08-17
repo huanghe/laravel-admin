@@ -53,7 +53,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @method Field\Number         number($column, $label = '')
  * @method Field\Currency       currency($column, $label = '')
  * @method Field\HasMany        hasMany($relationName, $callback)
- * @method Field\SwitchField    switch($column, $label = '')
+ * @method Field\SwitchField    switch ($column, $label = '')
  * @method Field\Display        display($column, $label = '')
  * @method Field\Rate           rate($column, $label = '')
  * @method Field\Divide         divider()
@@ -224,9 +224,7 @@ class Form
         $this->builder->setMode(Builder::MODE_EDIT);
         $this->builder->setResourceId($id);
 
-        $this->setFieldValue($id);
-
-        return $this;
+        return $this->setFieldValue($id);
     }
 
     /**
@@ -247,7 +245,7 @@ class Form
     /**
      * Use tab to split form.
      *
-     * @param string  $title
+     * @param string $title
      * @param Closure $content
      *
      * @return $this
@@ -304,7 +302,6 @@ class Form
     {
         $data = $this->model->with($this->getRelations())
             ->findOrFail($id)->toArray();
-
         $this->builder->fields()->filter(function ($field) {
             return $field instanceof Field\File;
         })->each(function (File $file) use ($data) {
@@ -317,7 +314,7 @@ class Form
     /**
      * Store a new record.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\Http\JsonResponse
+     * @return Array
      */
     public function store()
     {
@@ -325,7 +322,11 @@ class Form
 
         // Handle validation errors.
         if ($validationMessages = $this->validationMessages($data)) {
-            return back()->withInput()->withErrors($validationMessages);
+            return [
+                'status_code' => 400,
+                'message' => 'some data invalid',
+                'errors' => $validationMessages,
+            ];
         }
 
         if (($response = $this->prepare($data)) instanceof Response) {
@@ -334,25 +335,18 @@ class Form
 
         DB::transaction(function () {
             $inserts = $this->prepareInsert($this->updates);
-
             foreach ($inserts as $column => $value) {
                 $this->model->setAttribute($column, $value);
             }
 
             $this->model->save();
-
             $this->updateRelation($this->relations);
         });
 
-        if (($response = $this->complete($this->saved)) instanceof Response) {
-            return $response;
-        }
-
-        if ($response = $this->ajaxResponse(trans('admin.save_succeeded'))) {
-            return $response;
-        }
-
-        return $this->redirectAfterStore();
+        return [
+            'status_code' => 200,
+            'message' => 'success',
+        ];
     }
 
     /**
@@ -383,7 +377,7 @@ class Form
         // ajax but not pjax
         if ($request->ajax() && !$request->pjax()) {
             return response()->json([
-                'status'  => true,
+                'status_code' => 200,
                 'message' => $message,
             ]);
         }
@@ -404,7 +398,7 @@ class Form
             return $response;
         }
 
-        $this->inputs = array_merge($this->removeIgnoredFields($data), $this->inputs);
+        $this->inputs = $this->removeIgnoredFields($data);
 
         if (($response = $this->callSaving()) instanceof Response) {
             return $response;
@@ -492,11 +486,13 @@ class Form
     }
 
     /**
-     * Handle update.
-     *
-     * @param int $id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     *  author:HAHAXIXI
+     *  created_at: 2018-8-
+     *  updated_at: 2018-8-
+     * @param $id
+     * @param null $data
+     * @return $this|mixed|Response
+     *  desc   :
      */
     public function update($id, $data = null)
     {
@@ -510,12 +506,12 @@ class Form
 
         if ($this->handleOrderable($id, $data)) {
             return response([
-                'status'  => true,
+                'status_code' => 200,
                 'message' => trans('admin.update_succeeded'),
             ]);
         }
 
-        /* @var Model $this->model */
+        /* @var Model $this ->model */
         $this->model = $this->model->with($this->getRelations())->findOrFail($id);
 
         $this->setFieldOriginalValue();
@@ -535,9 +531,8 @@ class Form
 
         DB::transaction(function () {
             $updates = $this->prepareUpdate($this->updates);
-
             foreach ($updates as $column => $value) {
-                /* @var Model $this->model */
+                /* @var Model $this ->model */
                 $this->model->setAttribute($column, $value);
             }
 
@@ -545,16 +540,10 @@ class Form
 
             $this->updateRelation($this->relations);
         });
-
-        if (($result = $this->complete($this->saved)) instanceof Response) {
-            return $result;
-        }
-
-        if ($response = $this->ajaxResponse(trans('admin.update_succeeded'))) {
-            return $response;
-        }
-
-        return $this->redirectAfterUpdate();
+        return response([
+            'status_code' => 200,
+            'message' => 'success',
+        ]);
     }
 
     /**
@@ -623,7 +612,7 @@ class Form
     /**
      * Handle orderable update.
      *
-     * @param int   $id
+     * @param int $id
      * @param array $input
      *
      * @return bool
@@ -663,7 +652,6 @@ class Form
                 || $relation instanceof \Illuminate\Database\Eloquent\Relations\MorphOne;
 
             $prepared = $this->prepareUpdate([$name => $values], $oneToOneRelation);
-
             if (empty($prepared)) {
                 continue;
             }
@@ -733,7 +721,7 @@ class Form
      * Prepare input data for update.
      *
      * @param array $updates
-     * @param bool  $oneToOneRelation If column is one-to-one relation.
+     * @param bool $oneToOneRelation If column is one-to-one relation.
      *
      * @return array
      */
@@ -771,15 +759,16 @@ class Form
 
     /**
      * @param string|array $columns
-     * @param bool         $oneToOneRelation
+     * @param bool $oneToOneRelation
      *
      * @return bool
      */
     protected function invalidColumn($columns, $oneToOneRelation = false)
     {
-        foreach ((array) $columns as $column) {
+        foreach ((array)$columns as $column) {
             if ((!$oneToOneRelation && Str::contains($column, '.')) ||
-                ($oneToOneRelation && !Str::contains($column, '.'))) {
+                ($oneToOneRelation && !Str::contains($column, '.'))
+            ) {
                 return true;
             }
         }
@@ -799,7 +788,6 @@ class Form
         if ($this->isHasOneRelation($inserts)) {
             $inserts = array_dot($inserts);
         }
-
         foreach ($inserts as $column => $value) {
             if (is_null($field = $this->getFieldByColumn($column))) {
                 unset($inserts[$column]);
@@ -885,13 +873,13 @@ class Form
      */
     public function ignore($fields)
     {
-        $this->ignored = array_merge($this->ignored, (array) $fields);
+        $this->ignored = array_merge($this->ignored, (array)$fields);
 
         return $this;
     }
 
     /**
-     * @param array        $data
+     * @param array $data
      * @param string|array $columns
      *
      * @return array|mixed
@@ -966,13 +954,7 @@ class Form
 
 //        static::doNotSnakeAttributes($this->model);
 
-        $data = $this->model->toArray();
-
-        $this->builder->fields()->each(function (Field $field) use ($data) {
-            if (!in_array($field->column(), $this->ignored)) {
-                $field->fill($data);
-            }
-        });
+        return $this->model->toArray();
     }
 
     /**
@@ -1090,7 +1072,7 @@ class Form
     public function setWidth($fieldWidth = 8, $labelWidth = 2)
     {
         $this->builder()->fields()->each(function ($field) use ($fieldWidth, $labelWidth) {
-            /* @var Field $field  */
+            /* @var Field $field */
             $field->setWidth($fieldWidth, $labelWidth);
         });
 
@@ -1215,7 +1197,7 @@ class Form
      * Get or set input data.
      *
      * @param string $key
-     * @param null   $value
+     * @param null $value
      *
      * @return array|mixed
      */
@@ -1236,52 +1218,52 @@ class Form
     public static function registerBuiltinFields()
     {
         $map = [
-            'button'         => \Encore\Admin\Form\Field\Button::class,
-            'checkbox'       => \Encore\Admin\Form\Field\Checkbox::class,
-            'color'          => \Encore\Admin\Form\Field\Color::class,
-            'currency'       => \Encore\Admin\Form\Field\Currency::class,
-            'date'           => \Encore\Admin\Form\Field\Date::class,
-            'dateRange'      => \Encore\Admin\Form\Field\DateRange::class,
-            'datetime'       => \Encore\Admin\Form\Field\Datetime::class,
-            'dateTimeRange'  => \Encore\Admin\Form\Field\DatetimeRange::class,
-            'datetimeRange'  => \Encore\Admin\Form\Field\DatetimeRange::class,
-            'decimal'        => \Encore\Admin\Form\Field\Decimal::class,
-            'display'        => \Encore\Admin\Form\Field\Display::class,
-            'divider'        => \Encore\Admin\Form\Field\Divide::class,
-            'divide'         => \Encore\Admin\Form\Field\Divide::class,
-            'embeds'         => \Encore\Admin\Form\Field\Embeds::class,
-            'editor'         => \Encore\Admin\Form\Field\Editor::class,
-            'email'          => \Encore\Admin\Form\Field\Email::class,
-            'file'           => \Encore\Admin\Form\Field\File::class,
-            'hasMany'        => \Encore\Admin\Form\Field\HasMany::class,
-            'hidden'         => \Encore\Admin\Form\Field\Hidden::class,
-            'id'             => \Encore\Admin\Form\Field\Id::class,
-            'image'          => \Encore\Admin\Form\Field\Image::class,
-            'ip'             => \Encore\Admin\Form\Field\Ip::class,
-            'map'            => \Encore\Admin\Form\Field\Map::class,
-            'mobile'         => \Encore\Admin\Form\Field\Mobile::class,
-            'month'          => \Encore\Admin\Form\Field\Month::class,
+            'button' => \Encore\Admin\Form\Field\Button::class,
+            'checkbox' => \Encore\Admin\Form\Field\Checkbox::class,
+            'color' => \Encore\Admin\Form\Field\Color::class,
+            'currency' => \Encore\Admin\Form\Field\Currency::class,
+            'date' => \Encore\Admin\Form\Field\Date::class,
+            'dateRange' => \Encore\Admin\Form\Field\DateRange::class,
+            'datetime' => \Encore\Admin\Form\Field\Datetime::class,
+            'dateTimeRange' => \Encore\Admin\Form\Field\DatetimeRange::class,
+            'datetimeRange' => \Encore\Admin\Form\Field\DatetimeRange::class,
+            'decimal' => \Encore\Admin\Form\Field\Decimal::class,
+            'display' => \Encore\Admin\Form\Field\Display::class,
+            'divider' => \Encore\Admin\Form\Field\Divide::class,
+            'divide' => \Encore\Admin\Form\Field\Divide::class,
+            'embeds' => \Encore\Admin\Form\Field\Embeds::class,
+            'editor' => \Encore\Admin\Form\Field\Editor::class,
+            'email' => \Encore\Admin\Form\Field\Email::class,
+            'file' => \Encore\Admin\Form\Field\File::class,
+            'hasMany' => \Encore\Admin\Form\Field\HasMany::class,
+            'hidden' => \Encore\Admin\Form\Field\Hidden::class,
+            'id' => \Encore\Admin\Form\Field\Id::class,
+            'image' => \Encore\Admin\Form\Field\Image::class,
+            'ip' => \Encore\Admin\Form\Field\Ip::class,
+            'map' => \Encore\Admin\Form\Field\Map::class,
+            'mobile' => \Encore\Admin\Form\Field\Mobile::class,
+            'month' => \Encore\Admin\Form\Field\Month::class,
             'multipleSelect' => \Encore\Admin\Form\Field\MultipleSelect::class,
-            'number'         => \Encore\Admin\Form\Field\Number::class,
-            'password'       => \Encore\Admin\Form\Field\Password::class,
-            'radio'          => \Encore\Admin\Form\Field\Radio::class,
-            'rate'           => \Encore\Admin\Form\Field\Rate::class,
-            'select'         => \Encore\Admin\Form\Field\Select::class,
-            'slider'         => \Encore\Admin\Form\Field\Slider::class,
-            'switch'         => \Encore\Admin\Form\Field\SwitchField::class,
-            'text'           => \Encore\Admin\Form\Field\Text::class,
-            'textarea'       => \Encore\Admin\Form\Field\Textarea::class,
-            'time'           => \Encore\Admin\Form\Field\Time::class,
-            'timeRange'      => \Encore\Admin\Form\Field\TimeRange::class,
-            'url'            => \Encore\Admin\Form\Field\Url::class,
-            'year'           => \Encore\Admin\Form\Field\Year::class,
-            'html'           => \Encore\Admin\Form\Field\Html::class,
-            'tags'           => \Encore\Admin\Form\Field\Tags::class,
-            'icon'           => \Encore\Admin\Form\Field\Icon::class,
-            'multipleFile'   => \Encore\Admin\Form\Field\MultipleFile::class,
-            'multipleImage'  => \Encore\Admin\Form\Field\MultipleImage::class,
-            'captcha'        => \Encore\Admin\Form\Field\Captcha::class,
-            'listbox'        => \Encore\Admin\Form\Field\Listbox::class,
+            'number' => \Encore\Admin\Form\Field\Number::class,
+            'password' => \Encore\Admin\Form\Field\Password::class,
+            'radio' => \Encore\Admin\Form\Field\Radio::class,
+            'rate' => \Encore\Admin\Form\Field\Rate::class,
+            'select' => \Encore\Admin\Form\Field\Select::class,
+            'slider' => \Encore\Admin\Form\Field\Slider::class,
+            'switch' => \Encore\Admin\Form\Field\SwitchField::class,
+            'text' => \Encore\Admin\Form\Field\Text::class,
+            'textarea' => \Encore\Admin\Form\Field\Textarea::class,
+            'time' => \Encore\Admin\Form\Field\Time::class,
+            'timeRange' => \Encore\Admin\Form\Field\TimeRange::class,
+            'url' => \Encore\Admin\Form\Field\Url::class,
+            'year' => \Encore\Admin\Form\Field\Year::class,
+            'html' => \Encore\Admin\Form\Field\Html::class,
+            'tags' => \Encore\Admin\Form\Field\Tags::class,
+            'icon' => \Encore\Admin\Form\Field\Icon::class,
+            'multipleFile' => \Encore\Admin\Form\Field\MultipleFile::class,
+            'multipleImage' => \Encore\Admin\Form\Field\MultipleImage::class,
+            'captcha' => \Encore\Admin\Form\Field\Captcha::class,
+            'listbox' => \Encore\Admin\Form\Field\Listbox::class,
         ];
 
         foreach ($map as $abstract => $class) {
@@ -1357,7 +1339,7 @@ class Form
 
         return static::$collectedAssets = [
             'css' => $css->flatten()->unique()->filter()->toArray(),
-            'js'  => $js->flatten()->unique()->filter()->toArray(),
+            'js' => $js->flatten()->unique()->filter()->toArray(),
         ];
     }
 
@@ -1388,7 +1370,7 @@ class Form
      * Generate a Field object and add to form builder if Field exists.
      *
      * @param string $method
-     * @param array  $arguments
+     * @param array $arguments
      *
      * @return Field|void
      */

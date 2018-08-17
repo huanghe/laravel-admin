@@ -29,7 +29,6 @@ class Permission extends Model
     public function __construct(array $attributes = [])
     {
         $connection = config('admin.database.connection') ?: config('database.default');
-
         $this->setConnection($connection);
 
         $this->setTable(config('admin.database.permissions_table'));
@@ -42,7 +41,7 @@ class Permission extends Model
      *
      * @return BelongsToMany
      */
-    public function roles() : BelongsToMany
+    public function roles(): BelongsToMany
     {
         $pivotTable = config('admin.database.role_permissions_table');
 
@@ -58,7 +57,7 @@ class Permission extends Model
      *
      * @return bool
      */
-    public function shouldPassThrough(Request $request) : bool
+    public function shouldPassThrough(Request $request): bool
     {
         if (empty($this->http_method) && empty($this->http_path)) {
             return true;
@@ -67,7 +66,7 @@ class Permission extends Model
         $method = $this->http_method;
 
         $matches = array_map(function ($path) use ($method) {
-            $path = trim(config('admin.route.prefix'), '/').$path;
+            $path = trim(config('admin.route.prefix'), '/') . $path;
 
             if (Str::contains($path, ':')) {
                 list($method, $path) = explode(':', $path);
@@ -89,12 +88,12 @@ class Permission extends Model
     /**
      * If a request match the specific HTTP method and path.
      *
-     * @param array   $match
+     * @param array $match
      * @param Request $request
      *
      * @return bool
      */
-    protected function matchRequest(array $match, Request $request) : bool
+    protected function matchRequest(array $match, Request $request): bool
     {
         if (!$request->is(trim($match['path'], '/'))) {
             return false;

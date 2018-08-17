@@ -158,12 +158,12 @@ class Grid
      * @var array
      */
     protected $options = [
-        'usePagination'  => true,
-        'useFilter'      => true,
-        'useExporter'    => true,
-        'useActions'     => true,
+        'usePagination' => true,
+        'useFilter' => true,
+        'useExporter' => true,
+        'useActions' => true,
         'useRowSelector' => true,
-        'allowCreate'    => true,
+        'allowCreate' => true,
     ];
 
     /**
@@ -175,7 +175,7 @@ class Grid
      * Create a new grid instance.
      *
      * @param Eloquent $model
-     * @param Closure  $builder
+     * @param Closure $builder
      */
     public function __construct(Eloquent $model, Closure $builder)
     {
@@ -228,7 +228,7 @@ class Grid
      * Get or set option for grid.
      *
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return $this|mixed
      */
@@ -272,7 +272,7 @@ class Grid
 
             $label = empty($label) ? ucfirst($relationColumn) : $label;
 
-            $name = snake_case($relationName).'.'.$relationColumn;
+            $name = snake_case($relationName) . '.' . $relationColumn;
         }
 
         $column = $this->addColumn($name, $label);
@@ -423,27 +423,6 @@ class Grid
         return $this;
     }
 
-    /**
-     * Add `actions` column for grid.
-     *
-     * @return void
-     */
-    protected function appendActionsColumn()
-    {
-        if (!$this->option('useActions')) {
-            return;
-        }
-
-        $grid = $this;
-        $callback = $this->actionsCallback;
-        $column = $this->addColumn('__actions__', trans('admin.action'));
-
-        $column->display(function ($value) use ($grid, $column, $callback) {
-            $actions = new Actions($value, $grid, $column, $this);
-
-            return $actions->display($callback);
-        });
-    }
 
     /**
      * Disable row selector.
@@ -461,34 +440,11 @@ class Grid
     }
 
     /**
-     * Prepend checkbox column for grid.
-     *
-     * @return void
-     */
-    protected function prependRowSelectorColumn()
-    {
-        if (!$this->option('useRowSelector')) {
-            return;
-        }
-
-        $grid = $this;
-
-        $column = new Column(Column::SELECT_COLUMN_NAME, ' ');
-        $column->setGrid($this);
-
-        $column->display(function ($value) use ($grid, $column) {
-            $actions = new RowSelector($value, $grid, $column, $this);
-
-            return $actions->display();
-        });
-
-        $this->columns->prepend($column);
-    }
-
-    /**
-     * Build the grid.
-     *
-     * @return void
+     *  author:HAHAXIXI
+     *  created_at: 2018-8-9
+     *  updated_at: 2018-8-
+     * @return array|void
+     *  desc   :
      */
     public function build()
     {
@@ -496,22 +452,7 @@ class Grid
             return;
         }
 
-        $data = $this->processFilter();
-
-        $this->prependRowSelectorColumn();
-        $this->appendActionsColumn();
-
-        Column::setOriginalGridData($data);
-
-        $this->columns->map(function (Column $column) use (&$data) {
-            $data = $column->fill($data);
-
-            $this->columnNames[] = $column->getName();
-        });
-
-        $this->buildRows($data);
-
-        $this->builded = true;
+        return $data = $this->processFilter();
     }
 
     /**
@@ -645,7 +586,7 @@ class Grid
     /**
      * Get the export url.
      *
-     * @param int  $scope
+     * @param int $scope
      * @param null $args
      *
      * @return string
@@ -654,7 +595,7 @@ class Grid
     {
         $input = array_merge(Input::all(), Exporter::formatExportQuery($scope, $args));
 
-        return $this->resource().'?'.http_build_query($input);
+        return $this->resource() . '?' . http_build_query($input);
     }
 
     /**
@@ -907,19 +848,19 @@ class Grid
     public static function registerColumnDisplayer()
     {
         $map = [
-            'editable'    => \Encore\Admin\Grid\Displayers\Editable::class,
-            'switch'      => \Encore\Admin\Grid\Displayers\SwitchDisplay::class,
+            'editable' => \Encore\Admin\Grid\Displayers\Editable::class,
+            'switch' => \Encore\Admin\Grid\Displayers\SwitchDisplay::class,
             'switchGroup' => \Encore\Admin\Grid\Displayers\SwitchGroup::class,
-            'select'      => \Encore\Admin\Grid\Displayers\Select::class,
-            'image'       => \Encore\Admin\Grid\Displayers\Image::class,
-            'label'       => \Encore\Admin\Grid\Displayers\Label::class,
-            'button'      => \Encore\Admin\Grid\Displayers\Button::class,
-            'link'        => \Encore\Admin\Grid\Displayers\Link::class,
-            'badge'       => \Encore\Admin\Grid\Displayers\Badge::class,
+            'select' => \Encore\Admin\Grid\Displayers\Select::class,
+            'image' => \Encore\Admin\Grid\Displayers\Image::class,
+            'label' => \Encore\Admin\Grid\Displayers\Label::class,
+            'button' => \Encore\Admin\Grid\Displayers\Button::class,
+            'link' => \Encore\Admin\Grid\Displayers\Link::class,
+            'badge' => \Encore\Admin\Grid\Displayers\Badge::class,
             'progressBar' => \Encore\Admin\Grid\Displayers\ProgressBar::class,
-            'radio'       => \Encore\Admin\Grid\Displayers\Radio::class,
-            'checkbox'    => \Encore\Admin\Grid\Displayers\Checkbox::class,
-            'orderable'   => \Encore\Admin\Grid\Displayers\Orderable::class,
+            'radio' => \Encore\Admin\Grid\Displayers\Radio::class,
+            'checkbox' => \Encore\Admin\Grid\Displayers\Checkbox::class,
+            'orderable' => \Encore\Admin\Grid\Displayers\Orderable::class,
         ];
 
         foreach ($map as $abstract => $class) {
@@ -957,7 +898,7 @@ class Grid
      * Set a view to render.
      *
      * @param string $view
-     * @param array  $variables
+     * @param array $variables
      */
     public function setView($view, $variables = [])
     {
@@ -976,12 +917,11 @@ class Grid
     public function render()
     {
         try {
-            $this->build();
+            $data = $this->build();
         } catch (\Exception $e) {
             return Handler::renderException($e);
         }
-
-        return view($this->view, $this->variables())->render();
+        return $data;
     }
 
     /**

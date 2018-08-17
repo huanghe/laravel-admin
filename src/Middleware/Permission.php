@@ -6,6 +6,7 @@ use Encore\Admin\Auth\Permission as Checker;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\UnauthorizedException;
 
 class Permission
 {
@@ -18,8 +19,8 @@ class Permission
      * Handle an incoming request.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \Closure                 $next
-     * @param array                    $args
+     * @param \Closure $next
+     * @param array $args
      *
      * @return mixed
      */
@@ -32,11 +33,11 @@ class Permission
         if ($this->checkRoutePermission($request)) {
             return $next($request);
         }
-
         if (!Admin::user()->allPermissions()->first(function ($permission) use ($request) {
             return $permission->shouldPassThrough($request);
-        })) {
-            Checker::error();
+        })
+        ) {
+            throw new UnauthorizedException('no permission');
         }
 
         return $next($request);
@@ -52,14 +53,15 @@ class Permission
      */
     public function checkRoutePermission(Request $request)
     {
+
         if (!$middleware = collect($request->route()->middleware())->first(function ($middleware) {
-            return Str::startsWith($middleware, $this->middlewarePrefix);
-        })) {
+            return Str::startsWith($middleware, $this->middlewarePrefix);//admin.permission:
+        })
+        ) {
             return false;
         }
 
         $args = explode(',', str_replace($this->middlewarePrefix, '', $middleware));
-
         $method = array_shift($args);
 
         if (!method_exists(Checker::class, $method)) {

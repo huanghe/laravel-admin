@@ -5,7 +5,6 @@ namespace Encore\Admin\Controllers;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Auth\Database\Permission;
 use Encore\Admin\Auth\Database\Role;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -15,49 +14,6 @@ class UserController extends Controller
 {
     use ModelForm;
 
-    /**
-     * Index interface.
-     *
-     * @return Content
-     */
-    public function index()
-    {
-        return Admin::content(function (Content $content) {
-            $content->header(trans('admin.administrator'));
-            $content->description(trans('admin.list'));
-            $content->body($this->grid()->render());
-        });
-    }
-
-    /**
-     * Edit interface.
-     *
-     * @param $id
-     *
-     * @return Content
-     */
-    public function edit($id)
-    {
-        return Admin::content(function (Content $content) use ($id) {
-            $content->header(trans('admin.administrator'));
-            $content->description(trans('admin.edit'));
-            $content->body($this->form()->edit($id));
-        });
-    }
-
-    /**
-     * Create interface.
-     *
-     * @return Content
-     */
-    public function create()
-    {
-        return Admin::content(function (Content $content) {
-            $content->header(trans('admin.administrator'));
-            $content->description(trans('admin.create'));
-            $content->body($this->form());
-        });
-    }
 
     /**
      * Make a grid builder.
@@ -97,9 +53,8 @@ class UserController extends Controller
     {
         return Administrator::form(function (Form $form) {
             $form->display('id', 'ID');
-
             $form->text('username', trans('admin.username'))->rules('required');
-            $form->text('name', trans('admin.name'))->rules('required');
+            $form->text('email', trans('admin.email'))->rules('required');
             $form->image('avatar', trans('admin.avatar'));
             $form->password('password', trans('admin.password'))->rules('required|confirmed');
             $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')

@@ -9,7 +9,6 @@ use Encore\Admin\Widgets\Navbar;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Route;
 use InvalidArgumentException;
 
 /**
@@ -76,6 +75,27 @@ class Admin
         return new Tree($this->getModel($model), $callable);
     }
 
+    public function userTree($user, $model, Closure $callable = null)
+    {
+        $tree = $this->tree($model, $callable);
+        $this->roleCheck($tree, $user);
+    }
+
+    public function roleCheck($tree, $user)
+    {
+        foreach ($tree as $key => $node) {
+            if ($user->visible($node['roles'])) {
+                if (isset($node['children'])) {
+                    foreach ($node['children'] as $item) {
+                        $this->roleCheck($item, $user);
+                    }
+                }
+            } else {
+                unset($tree[$key]);
+            }
+        }
+    }
+
     /**
      * @param Closure $callable
      *
@@ -114,7 +134,7 @@ class Admin
     public static function css($css = null)
     {
         if (!is_null($css)) {
-            self::$css = array_merge(self::$css, (array) $css);
+            self::$css = array_merge(self::$css, (array)$css);
 
             return;
         }
@@ -136,7 +156,7 @@ class Admin
     public static function js($js = null)
     {
         if (!is_null($js)) {
-            self::$js = array_merge(self::$js, (array) $js);
+            self::$js = array_merge(self::$js, (array)$js);
 
             return;
         }
@@ -156,7 +176,7 @@ class Admin
     public static function script($script = '')
     {
         if (!empty($script)) {
-            self::$script = array_merge(self::$script, (array) $script);
+            self::$script = array_merge(self::$script, (array)$script);
 
             return;
         }
@@ -224,38 +244,51 @@ class Admin
         return $this->navbar;
     }
 
+
     /**
-     * Register the auth routes.
-     *
-     * @return void
+     *  author:HAHAXIXI
+     *  created_at: 2018-7-31
+     *  updated_at: 2018-7-
+     *  desc   :    注册默认路由
      */
-    public function registerAuthRoutes()
+    public function registerDefaultRoutes()
     {
-        $attributes = [
-            'prefix'     => config('admin.route.prefix'),
-            'namespace'  => 'Encore\Admin\Controllers',
-            'middleware' => config('admin.route.middleware'),
-        ];
+        $api = app('Dingo\Api\Routing\Router');
+        $api->version('v1', [
+            'prefix' => config('admin.route.prefix'),
+            'namespace' => 'Encore\Admin\Controllers',
+            'middleware' => [],
+        ], function ($api) {
+            $api->post('login', 'PublicController@login');
+            // 需要 token 验证的接口
+            $api->group(['middleware' => 'auth_without_permission'], function ($api) {//校验token的中间件api.auth
 
-        Route::group($attributes, function ($router) {
+                $api->get('menu', 'PublicController@menu');
+                $api->get('check_permission/{permissions}', 'AuthController@PermissionCheck');//批量权限检查
+                $api->get('user_can/{permission}', 'AuthController@can');//检查某个具体权限
+                $api->get('all_permissions', 'AuthController@allPermissions');//全部权限
 
-            /* @var \Illuminate\Routing\Router $router */
-            $router->group([], function ($router) {
+            });
+            // 需要 token 验证,并且验证权限的接口
+            $api->group(['middleware' => config('admin.route.middleware')], function ($api) {//校验token的中间件api.auth
 
-                /* @var \Illuminate\Routing\Router $router */
-                $router->resource('auth/users', 'UserController');
-                $router->resource('auth/api/users', 'UserApiController');
-                $router->resource('auth/roles', 'RoleController');
-                $router->resource('auth/permissions', 'PermissionController');
-                $router->resource('auth/menu', 'MenuController', ['except' => ['create']]);
-                $router->resource('auth/logs', 'LogController', ['only' => ['index', 'destroy']]);
+                /* resources:
+                    Verb	    URI	                    Action	    Route Name
+                    GET	        /photos	                index	    photos.index
+                    GET	        /photos/create          create	    photos.create
+                    POST	    /photos	                store	    photos.store
+                    GET	        /photos/{photo}	        show	    photos.show
+                    GET	        /photos/{photo}/edit	edit	    photos.edit
+                    PUT/PATCH   /photos/{photo}	        update	    photos.update
+                    DELETE	    /photos/{photo}	        destroy	    photos.destroy
+                 */
+                $api->resource('users', 'UserController', ['except' => ['create', 'edit']]);
+                $api->resource('roles', 'RoleController', ['except' => ['create', 'edit']]);
+                $api->resource('permissions', 'PermissionController', ['except' => ['create', 'edit']]);
+                $api->resource('menus', 'MenuController', ['except' => ['create', 'edit']]);
+                $api->resource('logs', 'LogController', ['only' => ['index', 'destroy']]);
             });
 
-            $router->get('auth/login', 'AuthController@getLogin');
-            $router->post('auth/login', 'AuthController@postLogin');
-            $router->get('auth/logout', 'AuthController@getLogout');
-            $router->get('auth/setting', 'AuthController@getSetting');
-            $router->put('auth/setting', 'AuthController@putSetting');
         });
     }
 
