@@ -1,6 +1,6 @@
 {
-    "name": "encore/laravel-admin",
-    "description": "laravel admin",
+    "name": "hahaxixi/laravel-rbac",
+    "description": "laravel admin版本只要权限模块，封装成API",
     "type": "library",
     "keywords": ["laravel", "admin", "grid", "form"],
     "homepage": "https://github.com/z-song/laravel-admin",
