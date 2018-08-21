@@ -74,29 +74,12 @@ class InstallCommand extends Command
 
         $this->makeDir('Controllers');
 
-        $this->createHomeController();
         $this->createExampleController();
 
         $this->createBootstrapFile();
         $this->createRoutesFile();
     }
 
-    /**
-     * Create HomeController.
-     *
-     * @return void
-     */
-    public function createHomeController()
-    {
-        $homeController = $this->directory.'/Controllers/HomeController.php';
-        $contents = $this->getStub('HomeController');
-
-        $this->laravel['files']->put(
-            $homeController,
-            str_replace('DummyNamespace', config('admin.route.namespace'), $contents)
-        );
-        $this->line('<info>HomeController file was created:</info> '.str_replace(base_path(), '', $homeController));
-    }
 
     /**
      * Create HomeController.

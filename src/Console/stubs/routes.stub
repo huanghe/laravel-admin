@@ -1,15 +1,15 @@
 <?php
+//注册login、rbac等路由
+Admin::registerDefaultRoutes();
 
-use Illuminate\Routing\Router;
+$api = app('Dingo\Api\Routing\Router');
 
-Admin::registerAuthRoutes();
-
-Route::group([
-    'prefix'        => config('admin.route.prefix'),
-    'namespace'     => config('admin.route.namespace'),
-    'middleware'    => config('admin.route.middleware'),
-], function (Router $router) {
-
-    $router->get('/', 'HomeController@index');
-
+$api->version('v1', [
+    'prefix' => config('admin.route.prefix'),
+    'namespace' => config('admin.route.namespace'),
+    'middleware' => [],//返回数据结构为 ArraySerializer
+], function ($api) {
+    $api->get('test', "TestController@index");//测试
+    $api->group(['middleware' => config('admin.route.middleware')], function ($api) {//需要登陆鉴权的路由
+    });
 });

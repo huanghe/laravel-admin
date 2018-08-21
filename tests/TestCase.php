@@ -7,7 +7,7 @@ use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
-    protected $baseUrl = 'http://localhost:8000';
+    protected $baseUrl = 'http://127.0.0.1:8000';
 
     /**
      * Boots the application.
@@ -25,13 +25,16 @@ class TestCase extends BaseTestCase
 
         $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
+        $app->register('Dingo\Api\Provider\LaravelServiceProvider');//注册dingo
         $app->register('Encore\Admin\AdminServiceProvider');
+
 
         return $app;
     }
 
     public function setUp()
     {
+
         parent::setUp();
 
         $adminConfig = require __DIR__.'/config/admin.php';
@@ -42,7 +45,6 @@ class TestCase extends BaseTestCase
         $this->app['config']->set('database.connections.mysql.username', 'root');
         $this->app['config']->set('database.connections.mysql.password', '123456');
         $this->app['config']->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
-        $this->app['config']->set('filesystems', require __DIR__.'/config/filesystems.php');
         $this->app['config']->set('admin', $adminConfig);
 
         foreach (array_dot(array_get($adminConfig, 'auth'), 'auth.') as $key => $value) {
@@ -50,7 +52,6 @@ class TestCase extends BaseTestCase
         }
 
         $this->artisan('vendor:publish', ['--provider' => 'Encore\Admin\AdminServiceProvider']);
-
         Schema::defaultStringLength(191);
 
         $this->artisan('admin:install');

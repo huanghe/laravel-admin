@@ -7,15 +7,6 @@ return [
      */
     'name' => 'Laravel-admin',
 
-    /*
-     * Logo in admin panel header.
-     */
-    'logo' => '<b>Laravel</b> admin',
-
-    /*
-     * Mini-logo in admin panel header.
-     */
-    'logo-mini' => '<b>La</b>',
 
     /*
      * Route configuration.
@@ -50,7 +41,7 @@ return [
     'auth' => [
         'guards' => [
             'admin' => [
-                'driver'   => 'session',
+                'driver'   => 'jwt',
                 'provider' => 'admin',
             ],
         ],
@@ -61,19 +52,7 @@ return [
                 'model'  => Encore\Admin\Auth\Database\Administrator::class,
             ],
         ],
-    ],
-
-    /*
-     * Laravel-admin upload setting.
-     */
-    'upload' => [
-
-        'disk' => 'admin',
-
-        'directory' => [
-            'image' => 'images',
-            'file'  => 'files',
-        ],
+        'jwt' => 'Dingo\Api\Auth\Provider\JWT',
     ],
 
     /*
@@ -85,27 +64,27 @@ return [
         'connection' => '',
 
         // User tables and model.
-        'users_table' => 'admin_users',
+        'users_table' => 'system_users',
         'users_model' => Encore\Admin\Auth\Database\Administrator::class,
 
         // Role table and model.
-        'roles_table' => 'admin_roles',
+        'roles_table' => 'system_roles',
         'roles_model' => Encore\Admin\Auth\Database\Role::class,
 
         // Permission table and model.
-        'permissions_table' => 'admin_permissions',
+        'permissions_table' => 'system_permissions',
         'permissions_model' => Encore\Admin\Auth\Database\Permission::class,
 
         // Menu table and model.
-        'menu_table' => 'admin_menu',
+        'menu_table' => 'system_menu',
         'menu_model' => Encore\Admin\Auth\Database\Menu::class,
 
         // Pivot table for table above.
-        'operation_log_table'    => 'admin_operation_log',
-        'user_permissions_table' => 'admin_user_permissions',
-        'role_users_table'       => 'admin_role_users',
-        'role_permissions_table' => 'admin_role_permissions',
-        'role_menu_table'        => 'admin_role_menu',
+        'operation_log_table'    => 'system_operation_log',
+        'user_permissions_table' => 'system_user_permissions',
+        'role_users_table'       => 'system_role_users',
+        'role_permissions_table' => 'system_role_permissions',
+        'role_menu_table'        => 'system_role_menu',
     ],
 
     /*
@@ -126,21 +105,6 @@ return [
         ],
     ],
 
-    /*
-     * @see https://adminlte.io/docs/2.4/layout
-     */
-    'skin' => 'skin-blue-light',
-
-    /*
-    |---------------------------------------------------------|
-    |LAYOUT OPTIONS | fixed                                   |
-    |               | layout-boxed                            |
-    |               | layout-top-nav                          |
-    |               | sidebar-collapse                        |
-    |               | sidebar-mini                            |
-    |---------------------------------------------------------|
-     */
-    'layout' => ['sidebar-mini', 'sidebar-collapse'],
 
     /*
      * Version displayed in footer.

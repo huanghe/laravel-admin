@@ -8,16 +8,6 @@ return [
     'name' => 'Laravel-admin',
 
     /*
-     * Logo in admin panel header.
-     */
-    'logo' => '<b>Laravel</b> admin',
-
-    /*
-     * Mini-logo in admin panel header.
-     */
-    'logo-mini' => '<b>La</b>',
-
-    /*
      * Route configuration.
      */
     'route' => [
@@ -125,27 +115,6 @@ return [
             'admin/auth/logs*',
         ],
     ],
-
-    /*
-     * @see https://adminlte.io/docs/2.4/layout
-     */
-    'skin' => 'skin-blue-light',
-
-    /*
-    |---------------------------------------------------------|
-    |LAYOUT OPTIONS | fixed                                   |
-    |               | layout-boxed                            |
-    |               | layout-top-nav                          |
-    |               | sidebar-collapse                        |
-    |               | sidebar-mini                            |
-    |---------------------------------------------------------|
-     */
-    'layout' => ['sidebar-mini', 'sidebar-collapse'],
-
-    /*
-     * Background image in login page
-     */
-    'login_background_image' => '',
 
     /*
      * Version displayed in footer.
