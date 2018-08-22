@@ -9,7 +9,6 @@ $api->version('v1', [
     'namespace' => config('admin.route.namespace'),
     'middleware' => [],//返回数据结构为 ArraySerializer
 ], function ($api) {
-    $api->get('test', "TestController@index");//测试
     $api->group(['middleware' => config('admin.route.middleware')], function ($api) {//需要登陆鉴权的路由
     });
 });

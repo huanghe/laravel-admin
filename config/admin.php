@@ -48,7 +48,7 @@ return [
         'providers' => [
             'admin' => [
                 'driver' => 'eloquent',
-                'model' => Encore\Admin\Auth\Database\Administrator::class,
+                'model'  => Encore\Admin\Auth\Database\User::class,
             ],
         ],
     ],
@@ -115,11 +115,6 @@ return [
             'admin/auth/logs*',
         ],
     ],
-
-    /*
-     * Version displayed in footer.
-     */
-    'version' => '1.5.x-dev',
 
     /*
      * Settings for extensions.
