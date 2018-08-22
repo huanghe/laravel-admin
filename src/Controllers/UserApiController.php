@@ -2,7 +2,7 @@
 
 namespace Encore\Admin\Controllers;
 
-use Encore\Admin\Auth\Database\Administrator;
+use Encore\Admin\Auth\Database\User;
 use Encore\Admin\Auth\Database\Permission;
 use Encore\Admin\Auth\Database\Role;
 use Encore\Admin\Facades\Admin;
@@ -58,7 +58,7 @@ class UserApiController extends Controller
      */
     protected function grid()
     {
-        return Administrator::grid(function (Grid $grid) {
+        return User::grid(function (Grid $grid) {
             $grid->id('ID')->sortable();
             $grid->username(trans('admin.username'));
             $grid->name(trans('admin.name'));
@@ -87,7 +87,7 @@ class UserApiController extends Controller
      */
     public function form()
     {
-        return Administrator::form(function (Form $form) {
+        return User::form(function (Form $form) {
             $form->display('id', 'ID');
 
             $form->text('username', trans('admin.username'))->rules('required');

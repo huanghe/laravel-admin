@@ -15,8 +15,6 @@ class User extends Authenticatable implements JWTSubject
 {
     use AdminBuilder, HasPermissions;
 
-    protected $fillable = ['username', 'password', 'avatar'];
-
     /**
      * Create a new Eloquent model instance.
      *

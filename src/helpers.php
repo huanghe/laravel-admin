@@ -54,4 +54,15 @@ if (!function_exists('admin_base_path')) {
         return $prefix.'/'.trim($path, '/');
     }
 }
+if (!function_exists('admin_asset')) {
 
+    /**
+     * @param $path
+     *
+     * @return string
+     */
+    function admin_asset($path)
+    {
+        return asset($path, config('admin.secure'));
+    }
+}

@@ -2,12 +2,11 @@
 
 namespace Encore\Admin\Controllers;
 
-use Encore\Admin\Auth\Database\Administrator;
+use Encore\Admin\Auth\Database\User;
 use Encore\Admin\Auth\Database\Permission;
 use Encore\Admin\Auth\Database\Role;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Illuminate\Routing\Controller;
 
 class UserController extends Controller
@@ -22,7 +21,7 @@ class UserController extends Controller
      */
     protected function grid()
     {
-        return Administrator::grid(function (Grid $grid) {
+        return User::grid(function (Grid $grid) {
             $grid->id('ID')->sortable();
             $grid->username(trans('admin.username'));
             $grid->name(trans('admin.name'));
@@ -51,9 +50,10 @@ class UserController extends Controller
      */
     public function form()
     {
-        return Administrator::form(function (Form $form) {
+        return User::form(function (Form $form) {
             $form->display('id', 'ID');
             $form->text('username', trans('admin.username'))->rules('required');
+            $form->text('name', trans('admin.name'));
             $form->text('email', trans('admin.email'))->rules('required');
             $form->image('avatar', trans('admin.avatar'));
             $form->password('password', trans('admin.password'))->rules('required|confirmed');

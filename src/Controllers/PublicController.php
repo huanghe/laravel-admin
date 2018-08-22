@@ -16,6 +16,7 @@ class PublicController extends Controller
      * @var :inject userService;
      */
     protected $userService;
+
     /**
      * UserController constructor.
      * @param UserService $userService
@@ -24,6 +25,7 @@ class PublicController extends Controller
     {
         $this->userService = $userService;
     }
+
     /**
      * Handle a login request.
      *
@@ -57,17 +59,30 @@ class PublicController extends Controller
 
     public function roleCheck($tree, $user)
     {
-        foreach ($tree as $key => $node) {
-            if ($user->visible($node['roles'])) {
-                if (isset($node['children'])) {
-                    foreach ($node['children'] as $item) {
+        if (isset($tree['id'])) {//遍历到最后一层
+            if ($user->visible($tree['roles'])) {
+                if (isset($tree['children'])) {
+                    foreach ($tree['children'] as $item) {
                         $this->roleCheck($item, $user);
                     }
                 }
             } else {
-                unset($tree[$key]);
+                unset($tree[0]);
+            }
+        }else{
+            foreach ($tree as $key => $node) {
+                if ($user->visible($node['roles'])) {
+                    if (isset($node['children'])) {
+                        foreach ($node['children'] as $item) {
+                            $this->roleCheck($item, $user);
+                        }
+                    }
+                } else {
+                    unset($tree[$key]);
+                }
             }
         }
+
         return $tree;
     }
 }
