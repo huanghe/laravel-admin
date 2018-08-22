@@ -76,7 +76,7 @@ return [
 
         // User tables and model.
         'users_table' => 'system_users',
-        'users_model' => Encore\Admin\Auth\Database\Administrator::class,
+        'users_model' => Encore\Admin\Auth\Database\User::class,
 
         // Role table and model.
         'roles_table' => 'system_roles',
