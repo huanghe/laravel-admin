@@ -29,7 +29,7 @@
         "fzaninotto/faker": "~1.4",
         "intervention/image": "~2.3",
         "laravel/browser-kit-testing": "^2.0",
-        "laravel/laravel": "^5.6"
+        "laravel/laravel": "5.6 - 5.7"
     },
     "autoload": {
         "psr-4": {

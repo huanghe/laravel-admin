@@ -342,11 +342,7 @@ class Form
             $this->model->save();
             $this->updateRelation($this->relations);
         });
-
-        return [
-            'status_code' => 200,
-            'message' => 'success',
-        ];
+        return $this->model;
     }
 
     /**
